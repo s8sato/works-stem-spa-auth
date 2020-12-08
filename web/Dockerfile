@@ -7,10 +7,13 @@ FROM base AS dev
 ARG app_name
 LABEL ref="${app_name}_web:dev"
 WORKDIR /usr/local/src
+COPY . host/
 # The following project creation line is erased on the first run
-CMD create-elm-app cea && \
-    sed -i 's# create-elm-app cea && # #' Dockerfile && \
-    cd cea && \
+CMD create-elm-app cea && sed -i 's# create-elm-app cea && # #' Dockerfile && \
+    cp -r host/* cea && sed -i 's# cp -r host/* cea && # #' Dockerfile && \
+    rm -r host && sed -i 's# rm -r host && # #' Dockerfile && \
+    mv cea/* . && sed -i 's# mv cea/* . && # #' Dockerfile && \
+    rm -r cea && sed -i 's# rm -r cea && # #' Dockerfile && \
     elm-app start
 
 # FOR PRODUCTION:
