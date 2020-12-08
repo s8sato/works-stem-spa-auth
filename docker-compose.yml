@@ -10,7 +10,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./api:/usr/local/src
+      - ./web:/usr/local/src
   api:
     user: $UID:$GID
     build:
@@ -20,7 +20,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./web:/usr/local/src
+      - ./api:/usr/local/src
     depends_on:
       - db
   db:
