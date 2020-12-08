@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  web:
+    user: $UID:$GID
+    build:
+      context: ./web
+      args:
+        app_name: $APP_NAME
+    ports:
+      - "8080:80"
+    volumes:
+      - ./api:/usr/local/src
+  api:
+    user: $UID:$GID
+    build:
+      context: ./api
+      args:
+        app_name: $APP_NAME
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/usr/local/src
+    depends_on:
+      - db
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+
+volumes:
+  db:
