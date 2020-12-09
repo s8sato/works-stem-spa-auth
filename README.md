@@ -41,7 +41,9 @@ bash init.sh $APP_NAME \
 'SparkPost-API-KEY&==' \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
-docker-compose up
+docker-compose up -d &&
+rm -rf web/init &&
+docker-compose logs -f
 ```
 Configure '`quoted params`'.
 [My actix-web learning log][how to email] may help you.
@@ -54,3 +56,5 @@ REF='project_service:tag' \
 docker images -f label=ref=$REF -q \
 | xargs -I {} docker tag {} $REF
 ```
+
+## Thank you for reading!
