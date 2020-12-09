@@ -3,6 +3,7 @@
 [demo]: https://user-images.githubusercontent.com/49983831/95659183-2c1d1e00-0b5a-11eb-951e-f23cde2e57c4.gif
 [docker]: https://docs.docker.com/get-docker/
 [how to email]: https://github.com/satu-n/study-actix-web-simple-auth-server#using-sparkpost-to-send-registration-email
+[tips]: https://github.com/satu-n/tips
 
 ## What's this
 
@@ -32,7 +33,8 @@ Prerequisites:
 * bash
 
 Enter the command as follows to access http://localhost:8080
-```
+
+```bash
 APP_NAME='my_auth_spa' &&
 git clone https://github.com/satu-n/works-stem-auth_spa.git $APP_NAME &&
 cd $APP_NAME &&
@@ -45,16 +47,10 @@ docker-compose up -d &&
 rm -rf web/init &&
 docker-compose logs -f
 ```
+
 Configure '`quoted params`'.
 [My actix-web learning log][how to email] may help you.
 
-## Tips
-
-To tag each labeled build stage for each image, run the command as follows:
-```
-REF='project_service:tag' \
-docker images -f label=ref=$REF -q \
-| xargs -I {} docker tag {} $REF
-```
-
 ## Thank you for reading!
+
+See also [my dev tips][tips] if you like
