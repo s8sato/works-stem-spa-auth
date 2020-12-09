@@ -43,7 +43,7 @@ dest="api/.env"
   echo "API_PORT=$API_PORT"
 } >>$dest
 
-dest="web/src/Config.elm"
+dest="web/init/src/Config.elm"
 : >$dest
 {
   echo "module Config exposing (..)"
