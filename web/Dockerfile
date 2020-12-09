@@ -12,7 +12,7 @@ COPY . .
 CMD create-elm-app cea && sed -i 's# create-elm-app cea && # #' Dockerfile && \
     cp -r init/* cea && sed -i 's# cp -r init/* cea && # #' Dockerfile && \
     mv cea/* . && sed -i 's# mv cea/* . && # #' Dockerfile && \
-    rm -rf cea init && sed -i 's# rm -rf cea init && # #' Dockerfile && \
+    rm -rf cea && sed -i 's# rm -rf cea && # #' Dockerfile && \
     elm-app start
 
 # FOR PRODUCTION:
@@ -20,7 +20,8 @@ CMD create-elm-app cea && sed -i 's# create-elm-app cea && # #' Dockerfile && \
 # FROM base AS build
 # ARG app_name
 # LABEL ref="${app_name}_web:build"
-# WORKDIR /usr/local/src/cea
+# WORKDIR /usr/local/src
+# COPY . .
 # RUN elm-app build
 
 # FROM nginx:alpine
