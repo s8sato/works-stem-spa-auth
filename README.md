@@ -8,7 +8,7 @@
 
 * Baby of SPA with user authentication &#x1F476;
 * 1 command to get ready for dev
-* Hot reload both client/server side
+* Hot reload (HMR) both client/server side
 * Prefix `stem` derives from `stem cell`, which has potential to be any organ
 
 ### Demo
@@ -17,7 +17,7 @@
 
 ### Feature
 
-* Elm & Rust: extremely fast, accurate, safe development and production
+* Elm & Rust: fast, accurate, safe development and production
 * Docker container dev: portability & reproducibility
 * Email invitation and identification
 * Cookie authentication
