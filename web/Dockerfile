@@ -11,9 +11,9 @@ COPY . .
 # The following project creation line is erased on the first run
 CMD create-elm-app cea && sed -i 's# create-elm-app cea && # #' Dockerfile && \
     cp -r init/* cea && sed -i 's# cp -r init/* cea && # #' Dockerfile && \
-    rm -r init && sed -i 's# rm -r init && # #' Dockerfile && \
+    rm -rf init && sed -i 's# rm -rf init && # #' Dockerfile && \
     mv cea/* . && sed -i 's# mv cea/* . && # #' Dockerfile && \
-    rm -r cea && sed -i 's# rm -r cea && # #' Dockerfile && \
+    rm -rf cea && sed -i 's# rm -rf cea && # #' Dockerfile && \
     elm-app start
 
 # FOR PRODUCTION:
