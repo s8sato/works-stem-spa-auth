@@ -4,7 +4,7 @@ LABEL ref="${app_name}_api:dev"
 WORKDIR /usr/local/src
 # build dependencies
 COPY Cargo.toml .
-RUN echo "fn main() {}" > dummy.rs
+RUN echo "fn main() {}" >dummy.rs
 RUN sed -i 's#src/main.rs#dummy.rs#' Cargo.toml
 RUN cargo build
 RUN sed -i 's#dummy.rs#src/main.rs#' Cargo.toml
