@@ -8,11 +8,15 @@ ARG app_name
 LABEL ref="${app_name}_web:dev"
 WORKDIR /usr/local/src
 COPY . .
-# The following project creation line is erased on the first run
-CMD create-elm-app cea && sed -i 's# create-elm-app cea && # #' Dockerfile && \
-    cp -r init/* cea && sed -i 's# cp -r init/* cea && # #' Dockerfile && \
-    mv cea/* . && sed -i 's# mv cea/* . && # #' Dockerfile && \
-    rm -rf cea && sed -i 's# rm -rf cea && # #' Dockerfile && \
+CMD if [ -d "init" ]; then \
+      create-elm-app cea; \
+      cp -r init/* cea; \
+      cp -r cea/* .; \
+      rm -rf cea init; \
+    #   mv init _init; \
+    # elif [ -d "_init" ]; then \
+    #   rm -rf _init; \
+    fi; \
     elm-app start
 
 # FOR PRODUCTION:
