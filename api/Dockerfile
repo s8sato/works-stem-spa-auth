@@ -13,7 +13,9 @@ RUN rm dummy.rs
 RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-watch
 COPY . .
-CMD diesel migration run && cargo watch -x run
+RUN cargo build
+CMD diesel migration run && cargo run
+# CMD diesel migration run && cargo watch -x run
 
 # FOR PRODUCTION:
 
