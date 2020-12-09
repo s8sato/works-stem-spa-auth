@@ -24,5 +24,5 @@ pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
 }
 
 pub fn env_var(x:&str) -> String {
-    std::env::var(x).expect(format!("{} must be set", x))
+    std::env::var(x).expect(format!("{} must be set", x).as_str())
 }
