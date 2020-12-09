@@ -43,9 +43,7 @@ bash init.sh $APP_NAME \
 'SparkPost-API-KEY&==' \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
-docker-compose up -d &&
-rm -rf web/init &&
-docker-compose logs -f
+docker-compose up
 ```
 
 Configure '`quoted params`'.

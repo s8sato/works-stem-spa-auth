@@ -9,11 +9,11 @@ LABEL ref="${app_name}_web:dev"
 WORKDIR /usr/local/src
 COPY . .
 CMD if [ -f "___create-elm-app___" ]; then \
-      create-elm-app cea; \
-      cp -r init/* cea; \
-      cp -r cea/* .; \
-      rm -rf cea ___create-elm-app___; \
-    fi; \
+      create-elm-app cea && \
+      cp -r _init/* cea && \
+      rm ___create-elm-app___ && \
+    fi && \
+    cd cea && \
     elm-app start
 
 # FOR PRODUCTION:
