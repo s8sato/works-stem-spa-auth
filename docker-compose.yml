@@ -12,7 +12,6 @@ services:
     volumes:
       - ./web:/usr/local/src
   api:
-    user: $UID:$GID
     build:
       context: ./api
       args:
