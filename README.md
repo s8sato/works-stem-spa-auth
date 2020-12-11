@@ -1,4 +1,4 @@
-# works-stem-auth_spa
+# works-stem-spa-auth
 
 [demo]: https://user-images.githubusercontent.com/49983831/95659183-2c1d1e00-0b5a-11eb-951e-f23cde2e57c4.gif
 [docker]: https://docs.docker.com/get-docker/
@@ -35,8 +35,8 @@ Prerequisites:
 Enter the command as follows to access http://localhost:8080
 
 ```bash
-APP_NAME='my_auth_spa' &&
-git clone https://github.com/satu-n/works-stem-auth_spa.git $APP_NAME &&
+APP_NAME='my_spa' &&
+git clone https://github.com/satu-n/works-stem-spa-auth.git $APP_NAME &&
 cd $APP_NAME &&
 bash init.sh $APP_NAME \
 'new!database!password******' \
