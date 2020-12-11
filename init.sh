@@ -25,8 +25,8 @@ fi
 dest=".env"
 : >$dest
 {
-  # echo "UID=$(id -u $USER)"
-  # echo "GID=$(id -g $USER)"
+  echo "UID=$(id -u $USER)"
+  echo "GID=$(id -g $USER)"
   echo "APP_NAME=$1"
   echo "DB_PASSWORD=$2"
 } >>$dest

@@ -6,6 +6,8 @@ services:
       context: ./web
       args:
         app_name: $APP_NAME
+        uid: $UID
+        gid: $GID
     ports:
       - "8080:3000"
     volumes:
