@@ -16,7 +16,7 @@ RUN sed -i 's#src/main.rs#dummy.rs#' Cargo.toml
 RUN cargo build
 RUN sed -i 's#dummy.rs#src/main.rs#' Cargo.toml
 RUN rm dummy.rs
-# build dependencies
+# build executable
 COPY . .
 RUN cargo build
 # migrate if file "___migration___" exists
