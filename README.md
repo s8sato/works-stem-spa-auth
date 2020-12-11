@@ -43,12 +43,30 @@ bash init.sh $APP_NAME \
 'SparkPost-API-KEY&==' \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
-docker-compose up
+docker-compose run --rm api &&
+docker-compose run --rm web &&
+docker-compose up -d --build
 ```
 
 Configure '`quoted params`'.
 [My actix-web learning log][how to email] may help you.
 
+When the containers are up,
+
+modifications to the source code will be reflected immediately.
+
+```bash
+docker-compose logs -f
+```
+
+to watch how each container works and
+
+```bash
+docker-compose down
+```
+
+to finish today's work.
+
 ## Thank you for reading!
 
-See also [my dev tips][tips] if you like
+See also [my dev tips][tips] if you like.

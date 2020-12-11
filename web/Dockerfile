@@ -15,10 +15,11 @@ CMD if [ -f "___create-elm-app___" ]; then \
       create-elm-app cea; \
       cp -r _init/* cea; \
       rm ___create-elm-app___; \
-      sed -i 's/USER ${uid}:${gid}//' Dockerfile; \
-    fi && \
-    cd cea && \
-    elm-app start
+      sed -i 's/USER ${uid}:${gid}/#/' Dockerfile; \
+    else \
+      cd cea; \
+      elm-app start; \
+    fi
 
 # FOR PRODUCTION:
 

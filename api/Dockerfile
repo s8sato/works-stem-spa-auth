@@ -23,8 +23,9 @@ RUN cargo build
 CMD if [ -f "___migration___" ]; then \
       diesel migration run; \
       rm ___migration___; \
-    fi && \
-    cargo watch -x run
+    else \
+      cargo watch -x run; \
+    fi
 
 # FOR PRODUCTION:
 
