@@ -2,13 +2,12 @@ version: "3.8"
 
 services:
   web:
-    user: $UID:$GID # for Windows
     build:
       context: ./web
       args:
         app_name: $APP_NAME
     ports:
-      - "3030:3000"
+      - "8080:3000"
     volumes:
       - ./web:/usr/local/src
   api:
@@ -17,7 +16,7 @@ services:
       args:
         app_name: $APP_NAME
     ports:
-      - "3000:3000"
+      - "3030:3000"
     volumes:
       - ./api:/usr/local/src
     depends_on:

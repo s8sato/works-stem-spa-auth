@@ -51,7 +51,7 @@ fn query(eml: String, pool: web::Data<Pool>) -> Result<Invitation, crate::errors
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
     
     #[test]
     fn it_works() {

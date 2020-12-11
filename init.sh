@@ -9,7 +9,7 @@
 
 readonly API_PROTOCOL="http"
 readonly API_HOST="localhost"
-readonly API_PORT="3000"
+readonly API_PORT="3030"
 
 # if true, app serves no authentication by email, password, or cookie.
 personal_use=false
@@ -25,8 +25,8 @@ fi
 dest=".env"
 : >$dest
 {
-  echo "UID=$(id -u $USER)"
-  echo "GID=$(id -g $USER)"
+  # echo "UID=$(id -u $USER)"
+  # echo "GID=$(id -g $USER)"
   echo "APP_NAME=$1"
   echo "DB_PASSWORD=$2"
 } >>$dest
@@ -39,8 +39,8 @@ dest="api/.env"
   echo "SPARKPOST_API_KEY=$3"
   echo "SENDING_EMAIL_ADDRESS=$4"
   echo "API_PROTOCOL=$API_PROTOCOL"
-  echo "API_HOST=$API_HOST"
-  echo "API_PORT=$API_PORT"
+  # echo "API_HOST=$API_HOST"
+  # echo "API_PORT=$API_PORT"
 } >>$dest
 
 dest="web/_init/src/Config.elm"

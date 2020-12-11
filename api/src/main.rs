@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
                 CookieIdentityPolicy::new(utils::SECRET_KEY.as_bytes())
                     .name("auth")
                     .path("/")
-                    .domain(utils::env_var("API_HOST").as_str())
+                    // .domain(utils::env_var("HOSTNAME").as_str())
                     .max_age(86400)
                     .secure(
                         utils::env_var("API_PROTOCOL") == "https"
@@ -68,7 +68,7 @@ async fn main() -> std::io::Result<()> {
                     ),
             )
     })
-    .bind(format!("0.0.0.0:{}", utils::env_var("API_PORT")))?
+    .bind(format!("0.0.0.0:3000"))?
     .run()
     .await
 }
