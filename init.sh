@@ -25,8 +25,6 @@ fi
 dest=".env"
 : >$dest
 {
-  echo "UID=$(id -u $USER)"
-  echo "GID=$(id -g $USER)"
   echo "APP_NAME=$1"
   echo "DB_PASSWORD=$2"
 } >>$dest
@@ -39,8 +37,6 @@ dest="api/.env"
   echo "SPARKPOST_API_KEY=$3"
   echo "SENDING_EMAIL_ADDRESS=$4"
   echo "API_PROTOCOL=$API_PROTOCOL"
-  # echo "API_HOST=$API_HOST"
-  # echo "API_PORT=$API_PORT"
 } >>$dest
 
 dest="web/_init/src/Config.elm"

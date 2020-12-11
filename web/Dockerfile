@@ -10,12 +10,10 @@ WORKDIR /usr/local/src
 COPY . .
 ARG uid
 ARG gid
-USER ${uid}:${gid}
 CMD if [ -f "___create-elm-app___" ]; then \
       create-elm-app cea; \
       cp -r _init/* cea; \
       rm ___create-elm-app___; \
-      sed -i 's/USER ${uid}:${gid}/#/' Dockerfile; \
     else \
       cd cea; \
       elm-app start; \

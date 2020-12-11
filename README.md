@@ -44,8 +44,8 @@ bash init.sh $APP_NAME \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
 docker-compose run --rm api &&
-docker-compose run --rm web &&
-docker-compose up -d --build
+docker-compose run --rm -u "$(id -u $USER):$(id -g $USER)" web &&
+docker-compose up -d
 ```
 
 Configure '`quoted params`'.
