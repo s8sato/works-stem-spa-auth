@@ -1,6 +1,6 @@
 # works-stem-spa-auth
 
-[demo]: https://user-images.githubusercontent.com/49983831/95659183-2c1d1e00-0b5a-11eb-951e-f23cde2e57c4.gif
+[demo]: _images/demo.gif
 [docker]: https://docs.docker.com/get-docker/
 [how to email]: https://github.com/satu-n/study-actix-web-simple-auth-server#using-sparkpost-to-send-registration-email
 [tips]: https://github.com/satu-n/tips
