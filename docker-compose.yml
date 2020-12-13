@@ -9,16 +9,17 @@ services:
     ports:
       - "8080:3000"
     volumes:
-      - ./web:/usr/local/src
+      - ./web:/usr/local/src:cached # TODO is it works?
   api:
     build:
       context: ./api
       args:
         app_name: $APP_NAME
     ports:
-      - "3030:3000"
+      - "${API_PORT}:3000"
     volumes:
-      - ./api:/usr/local/src
+      - ./api:/usr/local/src:cached # TODO is it works?
+      - /tmp/target
     depends_on:
       - db
   db:
