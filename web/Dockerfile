@@ -8,8 +8,6 @@ ARG app_name
 LABEL ref="${app_name}_web:dev"
 WORKDIR /usr/local/src
 COPY . .
-ARG uid
-ARG gid
 CMD if [ -f "___create-elm-app___" ]; then \
       create-elm-app cea; \
       cp -r _init/* cea; \
