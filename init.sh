@@ -11,9 +11,6 @@ readonly API_PROTOCOL="http"
 readonly API_HOST="localhost"
 readonly API_PORT="3030"
 
-# if true, app serves no authentication by email, password, or cookie.
-personal_use=false
-
 if [ $# -ne 4 ]; then
   {
     echo "$# arguments found."
