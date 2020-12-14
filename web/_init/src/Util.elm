@@ -34,35 +34,52 @@ type alias HttpResult a =
     Result Http.Error a
 
 
+
+-- Http.riskyRequest allows API to set and receive Cookie
+
+
 get : EP.EndPoint -> (HttpResult a -> msg) -> Decoder a -> Cmd msg
 get ep resMsg dec =
-    Http.get
-        { url = strEP ep
+    Http.riskyRequest
+        { method = "GET"
+        , headers = []
+        , url = strEP ep
+        , body = Http.emptyBody
         , expect = Http.expectJson resMsg dec
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
 post : EP.EndPoint -> Encode.Value -> (HttpResult a -> msg) -> Decoder a -> Cmd msg
 post ep enc resMsg dec =
-    Http.post
-        { url = strEP ep
+    Http.riskyRequest
+        { method = "POST"
+        , headers = []
+        , url = strEP ep
         , body = Http.jsonBody enc
         , expect = Http.expectJson resMsg dec
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
 post_ : EP.EndPoint -> Encode.Value -> (HttpResult () -> msg) -> Cmd msg
 post_ ep enc resMsg =
-    Http.post
-        { url = strEP ep
+    Http.riskyRequest
+        { method = "POST"
+        , headers = []
+        , url = strEP ep
         , body = Http.jsonBody enc
         , expect = Http.expectWhatever resMsg
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
 delete : EP.EndPoint -> (HttpResult () -> msg) -> Cmd msg
 delete ep resMsg =
-    Http.request
+    Http.riskyRequest
         { method = "DELETE"
         , headers = []
         , url = strEP ep
