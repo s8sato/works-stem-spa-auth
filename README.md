@@ -62,7 +62,7 @@ source code updates will be reflected automatically.
 
 The dev screen looks like this:
 
-![dev_screen](dev_screen.png)
+![dev_screen](_images/dev_screen.png)
 
 ```bash
 docker-compose down
