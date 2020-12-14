@@ -1,5 +1,11 @@
 # works-stem-spa-auth
 
+__Under development:__
+
+- [ ] implement password forgetting handler
+- [ ] check the production part of the Dockerfile
+- [ ] improve API hot reload speed
+
 [demo]: _images/demo.gif
 [docker]: https://docs.docker.com/get-docker/
 [how to email]: https://github.com/satu-n/study-actix-web-simple-auth-server#using-sparkpost-to-send-registration-email
@@ -18,11 +24,11 @@
 
 ### Feature
 
-* Elm & Rust: fast, accurate, safe development and production
-* Docker container dev: portability & reproducibility
-* Email invitation and identification
-* Cookie authentication
-* No navigation: single URL & no browser back/forward
+* __Elm & Rust__: fast, accurate, safe development and production
+* __Docker__ container dev: portability & reproducibility
+* __Email__ invitation and identification
+* __Cookie__ authentication
+* __No navigation__: single URL & no browser back/forward
 
 ## How to run
 
@@ -52,7 +58,7 @@ Configure '`quoted params`'.
 
 When the containers are up,
 
-modifications to the source code will be reflected immediately.
+source code updates will be reflected automatically.
 
 ```bash
 docker-compose logs -f
