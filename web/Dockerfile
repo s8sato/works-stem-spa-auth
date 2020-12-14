@@ -1,17 +1,13 @@
 FROM node:15-alpine AS base
-ARG app_name
-LABEL ref="${app_name}_web:base"
 RUN npm install create-elm-app -g
 
 FROM base AS dev
-ARG app_name
-LABEL ref="${app_name}_web:dev"
 WORKDIR /usr/local/src
 COPY . .
-CMD if [ -f "___create-elm-app___" ]; then \
+ENV CREATE=false
+CMD if "${CREATE}"; then \
       create-elm-app cea; \
       cp -r _init/* cea; \
-      rm ___create-elm-app___; \
     else \
       cd cea; \
       elm-app start; \
@@ -20,8 +16,6 @@ CMD if [ -f "___create-elm-app___" ]; then \
 # FOR PRODUCTION:
 
 # FROM base AS build
-# ARG app_name
-# LABEL ref="${app_name}_web:build"
 # WORKDIR /usr/local/src
 # COPY . .
 # RUN elm-app build
@@ -40,8 +34,6 @@ CMD if [ -f "___create-elm-app___" ]; then \
 # RUN chmod +x /usr/local/bin/elm
 
 # FROM elm AS build
-# ARG app_name
-# LABEL ref="${app_name}_web:build"
 # WORKDIR /usr/local/src
 # COPY . .
 # RUN elm make src/Main.elm --optimize

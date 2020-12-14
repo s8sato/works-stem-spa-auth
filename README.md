@@ -43,8 +43,7 @@ bash init.sh $APP_NAME \
 'SparkPost-API-KEY&==' \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
-docker-compose run --rm api &&
-docker-compose run --rm -u "$(id -u $USER):$(id -g $USER)" web &&
+docker-compose run --rm -e CREATE=true -u "$(id -u $USER):$(id -g $USER)" web &&
 docker-compose up -d
 ```
 

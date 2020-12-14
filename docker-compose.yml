@@ -2,23 +2,17 @@ version: "3.8"
 
 services:
   web:
-    build:
-      context: ./web
-      args:
-        app_name: $APP_NAME
+    build: ./web
     ports:
       - "8080:3000"
     volumes:
-      - ./web:/usr/local/src:cached # TODO is it works?
+      - ./web:/usr/local/src:cached
   api:
-    build:
-      context: ./api
-      args:
-        app_name: $APP_NAME
+    build: ./api
     ports:
       - "${API_PORT}:3000"
     volumes:
-      - ./api:/usr/local/src:cached # TODO is it works?
+      - ./api:/usr/local/src:cached
       - /tmp/target
     depends_on:
       - db

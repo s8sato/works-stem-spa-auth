@@ -1,12 +1,8 @@
 FROM rust:1.48 AS base
-ARG app_name
-LABEL ref="${app_name}_api:base"
 RUN cargo install diesel_cli --no-default-features --features postgres
 RUN cargo install cargo-watch
 
 FROM base AS dev
-ARG app_name
-LABEL ref="${app_name}_api:dev"
 WORKDIR /usr/local/src
 ENV CARGO_TARGET_DIR=/tmp/target
 # build dependencies
@@ -19,19 +15,16 @@ RUN rm dummy.rs
 # build executable
 COPY . .
 RUN cargo build
-# migrate if file "___migration___" exists
+# 
 CMD if [ -f "___migration___" ]; then \
       diesel migration run; \
       rm ___migration___; \
-    else \
-      cargo watch -x run; \
-    fi
+    fi && \
+    cargo watch -x run
 
 # FOR PRODUCTION:
 
 # FROM base AS build
-# ARG app_name
-# LABEL ref="${app_name}_api:build"
 # WORKDIR /usr/local/src
 # ENV CARGO_TARGET_DIR=/tmp/target
 # COPY . .

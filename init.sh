@@ -22,8 +22,8 @@ fi
 dest=".env"
 : >$dest
 {
-  echo "APP_NAME=$1"
   echo "DB_PASSWORD=$2"
+  echo "API_PORT=$API_PORT"
 } >>$dest
 
 dest="api/.env"
