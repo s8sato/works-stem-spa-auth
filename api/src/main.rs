@@ -5,6 +5,7 @@ use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
+use actix_cors::Cors;
 
 mod models;
 mod schema;
@@ -20,7 +21,8 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     std::env::set_var(
         "RUST_LOG",
-        "simple-auth-server=debug,actix_web=info,actix_server=info",
+        format!("{}=debug,actix_web=info,actix_server=info",
+            utils::env_var("APP_NAME")),
     );
     env_logger::init();
     
@@ -33,7 +35,9 @@ async fn main() -> std::io::Result<()> {
 
     // start http server
     HttpServer::new(move || {
+        let cors = Cors::permissive(); // TODO tighten for production
         App::new()
+            .wrap(cors)
             .data(pool.clone())
             // enable logger
             .wrap(middleware::Logger::default())
@@ -41,7 +45,7 @@ async fn main() -> std::io::Result<()> {
                 CookieIdentityPolicy::new(utils::SECRET_KEY.as_bytes())
                     .name("auth")
                     .path("/")
-                    // .domain(utils::env_var("HOSTNAME").as_str())
+                    // .domain(utils::env_var("COOKIE_DOMAIN").as_str()) // TODO if cross domain
                     .max_age(86400)
                     .secure(
                         utils::env_var("API_PROTOCOL") == "https"
@@ -62,9 +66,9 @@ async fn main() -> std::io::Result<()> {
                     )
                     .service(
                         web::resource("/auth")
+                            .route(web::get().to(auth_handler::get_me))
                             .route(web::post().to(auth_handler::login))
-                            .route(web::delete().to(auth_handler::logout))
-                            .route(web::get().to(auth_handler::get_me)),
+                            .route(web::delete().to(auth_handler::logout)),
                     ),
             )
     })
