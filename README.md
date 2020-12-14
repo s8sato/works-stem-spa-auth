@@ -50,21 +50,19 @@ bash init.sh $APP_NAME \
 'sending.email.address@my.domain.com' &&
 unset APP_NAME &&
 docker-compose run --rm -e CREATE=true -u "$(id -u $USER):$(id -g $USER)" web &&
-docker-compose up -d
-```
-
-Configure '`quoted params`'.
-[My actix-web learning log][how to email] may help you.
-
-When the containers are up,
-
-source code updates will be reflected automatically.
-
-```bash
+docker-compose up -d &&
 docker-compose logs -f
 ```
 
-to watch how each container works and
+Configure 4 '`single quoted params`'.
+[My actix-web learning log][how to email] may help you.
+
+When the containers are up,
+source code updates will be reflected automatically.
+
+The dev screen looks like this:
+
+![dev_screen](dev_screen.png)
 
 ```bash
 docker-compose down
