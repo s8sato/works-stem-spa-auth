@@ -7,9 +7,9 @@ use diesel::PgConnection;
 use futures::future::{err, ok, Ready};
 use serde::Deserialize;
 
-use crate::errors::ServiceError;
-use crate::models::{Pool, SlimUser, User};
-use crate::utils::verify;
+use crate::errors;
+use crate::models;
+use crate::utils;
 
 #[derive(Debug, Deserialize)]
 pub struct AuthData {
@@ -19,7 +19,7 @@ pub struct AuthData {
 
 // we need the same data
 // simple aliasing makes the intentions clear and its more readable
-pub type LoggedUser = SlimUser;
+pub type LoggedUser = models::SlimUser;
 
 impl FromRequest for LoggedUser {
     type Config = ();
@@ -34,7 +34,7 @@ impl FromRequest for LoggedUser {
                 }
             }
         }
-        err(ServiceError::Unauthorized.into())
+        err(errors::ServiceError::Unauthorized.into())
     }
 }
 
@@ -46,8 +46,8 @@ pub async fn logout(id: Identity) -> HttpResponse {
 pub async fn login(
     auth_data: web::Json<AuthData>,
     id: Identity,
-    pool: web::Data<Pool>,
-) -> Result<HttpResponse, ServiceError> {
+    pool: web::Data<models::Pool>,
+) -> Result<HttpResponse, errors::ServiceError> {
     let res = web::block(move || query(auth_data.into_inner(), pool)).await;
 
     match res {
@@ -58,7 +58,7 @@ pub async fn login(
         }
         Err(err) => match err {
             BlockingError::Error(service_error) => Err(service_error),
-            BlockingError::Canceled => Err(ServiceError::InternalServerError),
+            BlockingError::Canceled => Err(errors::ServiceError::InternalServerError),
         },
     }
 }
@@ -66,20 +66,24 @@ pub async fn login(
 pub async fn get_me(logged_user: LoggedUser) -> HttpResponse {
     HttpResponse::Ok().json(logged_user)
 }
-/// Diesel query
-fn query(auth_data: AuthData, pool: web::Data<Pool>) -> Result<SlimUser, ServiceError> {
+
+fn query(
+    auth_data: AuthData,
+    pool: web::Data<models::Pool>
+) -> Result<models::SlimUser, errors::ServiceError> {
     use crate::schema::users::dsl::{email, users};
+
     let conn: &PgConnection = &pool.get().unwrap();
     let mut items = users
         .filter(email.eq(&auth_data.email))
-        .load::<User>(conn)?;
+        .load::<models::User>(conn)?;
 
     if let Some(user) = items.pop() {
-        if let Ok(matching) = verify(&user.hash, &auth_data.password) {
+        if let Ok(matching) = utils::verify(&user.hash, &auth_data.password) {
             if matching {
                 return Ok(user.into());
             }
         }
     }
-    Err(ServiceError::Unauthorized)
+    Err(errors::ServiceError::Unauthorized)
 }

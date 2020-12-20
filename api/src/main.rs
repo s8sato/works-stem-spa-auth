@@ -7,20 +7,16 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use actix_cors::Cors;
 
-mod models;
 mod schema;
+mod models;
+mod handlers;
 mod errors;
-mod invitation_handler;
-mod email_service;
 mod utils;
-mod register_handler;
-mod auth_handler;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    std::env::set_var(
-        "RUST_LOG",
+    std::env::set_var("RUST_LOG",
         format!("{}=debug,actix_web=info,actix_server=info",
             utils::env_var("APP_NAME")),
     );
@@ -58,17 +54,17 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                     .service(
                         web::resource("/invite")
-                            .route(web::post().to(invitation_handler::post_invitation)),
+                            .route(web::post().to(handlers::invite::invite)),
                     )
                     .service(
                         web::resource("/register/{invitation_id}")
-                            .route(web::post().to(register_handler::register_user)),
+                            .route(web::post().to(handlers::register::register)),
                     )
                     .service(
                         web::resource("/auth")
-                            .route(web::get().to(auth_handler::get_me))
-                            .route(web::post().to(auth_handler::login))
-                            .route(web::delete().to(auth_handler::logout)),
+                            .route(web::get().to(handlers::auth::get_me))
+                            .route(web::post().to(handlers::auth::login))
+                            .route(web::delete().to(handlers::auth::logout)),
                     ),
             )
     })

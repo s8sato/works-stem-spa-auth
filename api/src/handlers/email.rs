@@ -1,13 +1,14 @@
-use crate::errors::ServiceError;
-use crate::models::Invitation;
-use crate::utils;
 use sparkpost::transmission;
+
+use crate::errors;
+use crate::models;
+use crate::utils;
 
 lazy_static::lazy_static! {
     static ref API_KEY: String = utils::env_var("SPARKPOST_API_KEY");
 }
 
-pub fn send_invitation(invitation: &Invitation) -> Result<(), ServiceError> {
+pub fn send(invitation: &models::Invitation) -> Result<(), errors::ServiceError> {
     let tm = transmission::Transmission::new(API_KEY.as_str());
     let sender = utils::env_var("APP_NAME");
     let sending_addr = utils::env_var("SENDING_EMAIL_ADDRESS");
@@ -56,12 +57,12 @@ pub fn send_invitation(invitation: &Invitation) -> Result<(), ServiceError> {
             }
             transmission::TransmissionResponse::ApiError(errors) => {
                 println!("Response Errors: \n {:#?}", &errors);
-                Err(ServiceError::InternalServerError)
+                Err(errors::ServiceError::InternalServerError)
             }
         },
         Err(error) => {
             println!("Send Email Error: \n {:#?}", error);
-            Err(ServiceError::InternalServerError)
+            Err(errors::ServiceError::InternalServerError)
         }
     }
 }
