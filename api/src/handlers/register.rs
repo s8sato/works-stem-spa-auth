@@ -9,16 +9,16 @@ use crate::utils;
 
 #[derive(Deserialize)]
 pub struct ReqUser {
-    pub key: uuid::Uuid,
-    pub email: String,
-    pub password: String,
+    key: uuid::Uuid,
+    email: String,
+    password: String,
 }
 
 #[derive(Insertable)]
 #[table_name = "users"]
-pub struct NewUser {
-    pub email: String,
-    pub hash: String,
+struct NewUser {
+    email: String,
+    hash: String,
 }
 
 impl ReqUser {
@@ -58,9 +58,9 @@ pub async fn register(
         let new_user = req_user.into_inner().pass(&pool)?;
         let conn = pool.get().unwrap();
         let user: models::User = diesel::insert_into(users).values(&new_user).get_result(&conn)?;
+
         Ok(models::SlimUser::from(user))
-    }
-    ).await;
+    }).await;
 
     match res {
         Ok(slim_user) => Ok(HttpResponse::Ok().json(&slim_user)),

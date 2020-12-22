@@ -1,23 +1,39 @@
 use actix_web::{error::BlockingError, web, HttpResponse};
-use diesel::{prelude::*, PgConnection};
+use diesel::prelude::*;
 use serde::Deserialize;
 
-use super::email;
-use crate::errors;
 use crate::models;
+use crate::errors;
+use super::email;
 
 #[derive(Deserialize)]
-pub struct InvitationData {
-    pub email: String,
+pub struct ReqInvitation {
+    email: String,
+}
+
+impl From<ReqInvitation> for models::Invitation {
+    fn from(req: ReqInvitation) -> Self {
+        models::Invitation {
+            id: uuid::Uuid::new_v4(),
+            email: req.email,
+            expires_at: chrono::Utc::now() + chrono::Duration::hours(1),
+        }
+    }
 }
 
 pub async fn invite(
-    invitation_data: web::Json<InvitationData>,
+    req_invitation: web::Json<ReqInvitation>,
     pool: web::Data<models::Pool>,
 ) -> Result<HttpResponse, errors::ServiceError> {
-    // run diesel blocking code
+
     let res = web::block(move || {
-        let invitation = dbg!(query(invitation_data.into_inner().email, pool)?);
+        use crate::schema::invitations::dsl::invitations;
+
+        let conn = pool.get().unwrap();
+        let new_invitation = models::Invitation::from(req_invitation.into_inner());
+        let invitation = diesel::insert_into(invitations).values(&new_invitation).get_result(&conn)?;
+        dbg!(&invitation);
+
         email::send(&invitation)
     }).await;
 
@@ -28,20 +44,4 @@ pub async fn invite(
             BlockingError::Canceled => Err(errors::ServiceError::InternalServerError),
         },
     }
-}
-
-fn query(
-    email: String,
-    pool: web::Data<models::Pool>
-) -> Result<models::Invitation, errors::ServiceError> {
-    use crate::schema::invitations::dsl::invitations;
-
-    let new_invitation: models::Invitation = email.into();
-    let conn: &PgConnection = &pool.get().unwrap();
-
-    let inserted_invitation = diesel::insert_into(invitations)
-        .values(&new_invitation)
-        .get_result(conn)?;
-
-    Ok(inserted_invitation)
 }
