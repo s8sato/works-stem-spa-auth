@@ -68,20 +68,19 @@ pub async fn register(
 
         let conn = pool.get().unwrap();
         let req = req_user.into_inner();
-        let user: models::User = if req.reset_pw {
+        if req.reset_pw {
             let old_user = users.filter(email.eq(&req.email)).first::<models::User>(&conn)?;
             let alt_user = req.to_alt(&conn)?;
-            diesel::update(&old_user).set(&alt_user).get_result(&conn)?
+            diesel::update(&old_user).set(&alt_user).execute(&conn)?
         } else {
             let new_user = req.to_new(&conn)?;
-            diesel::insert_into(users).values(&new_user).get_result(&conn)?
+            diesel::insert_into(users).values(&new_user).execute(&conn)?
         };
-
-        Ok(models::SlimUser::from(user))
+        Ok(())
     }).await;
 
     match res {
-        Ok(slim_user) => Ok(HttpResponse::Ok().json(&slim_user)),
+        Ok(_) => Ok(HttpResponse::Ok().finish()),
         Err(err) => match err {
             BlockingError::Error(service_error) => {
                 dbg!(&service_error);

@@ -17,7 +17,7 @@ mod utils;
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     std::env::set_var("RUST_LOG",
-        format!("{}=debug,actix_web=info,actix_server=info",
+        format!("{}=DEBUG,actix_web=INFO,actix_server=INFO",
             utils::env_var("APP_NAME")),
     );
     env_logger::init();
@@ -29,13 +29,11 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
-    // start http server
     HttpServer::new(move || {
         let cors = Cors::permissive(); // TODO tighten for production
         App::new()
             .wrap(cors)
             .data(pool.clone())
-            // enable logger
             .wrap(middleware::Logger::default())
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(utils::SECRET_KEY.as_bytes())
@@ -47,9 +45,7 @@ async fn main() -> std::io::Result<()> {
                         utils::env_var("API_PROTOCOL") == "https"
                         ), // TODO https
             ))
-            // limit the maximum amount of data that server will accept
             .data(web::JsonConfig::default().limit(4096))
-            // everything under '/api/' route
             .service(
                 web::scope("/api")
                     .service(

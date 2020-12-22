@@ -1,59 +1,61 @@
+use actix_web::{error::BlockingError, web, HttpResponse};
 use actix_identity::Identity;
-use actix_web::{
-    dev::Payload, error::BlockingError, web, Error, FromRequest, HttpRequest, HttpResponse,
-};
 use diesel::prelude::*;
-use diesel::PgConnection;
-use futures::future::{err, ok, Ready};
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
-use crate::errors;
 use crate::models;
+use crate::errors;
 use crate::utils;
 
-#[derive(Debug, Deserialize)]
-pub struct AuthData {
-    pub email: String,
-    pub password: String,
+#[derive(Deserialize)]
+pub struct ReqAuth {
+    email: String,
+    password: String,
 }
 
-// we need the same data
-// simple aliasing makes the intentions clear and its more readable
-pub type LoggedUser = models::SlimUser;
+#[derive(Serialize, Deserialize)]
+struct AuthedUser {
+    email: String,
+}
 
-impl FromRequest for LoggedUser {
-    type Config = ();
-    type Error = Error;
-    type Future = Ready<Result<LoggedUser, Error>>;
+impl ReqAuth {
+    fn to_authed(&self, conn: &models::Conn) -> Result<AuthedUser, errors::ServiceError> {
+        use crate::schema::users::dsl::{users, email};
 
-    fn from_request(req: &HttpRequest, pl: &mut Payload) -> Self::Future {
-        if let Ok(identity) = Identity::from_request(req, pl).into_inner() {
-            if let Some(user_json) = identity.identity() {
-                if let Ok(user) = serde_json::from_str(&user_json) {
-                    return ok(user);
-                }
-            }
+        let user = users
+            .filter(email.eq(&self.email))
+            .first::<models::User>(conn)?;
+        if utils::verify(&user.hash, &self.password)? {
+            return Ok(AuthedUser { email: user.email })
         }
-        err(errors::ServiceError::Unauthorized.into())
+        Err(errors::ServiceError::Unauthorized)
     }
 }
 
-pub async fn logout(id: Identity) -> HttpResponse {
-    id.forget();
-    HttpResponse::Ok().finish()
+pub async fn get_me(id: Identity) -> Result<HttpResponse, errors::ServiceError> {
+    if let Some(identity) = id.identity() {
+        if let Ok(authed_user) = serde_json::from_str::<AuthedUser>(&identity) {
+            return Ok(HttpResponse::Ok().json(&authed_user))
+        }
+    }
+    Err(errors::ServiceError::Unauthorized)
 }
 
 pub async fn login(
-    auth_data: web::Json<AuthData>,
+    req_auth: web::Json<ReqAuth>,
     id: Identity,
     pool: web::Data<models::Pool>,
 ) -> Result<HttpResponse, errors::ServiceError> {
-    let res = web::block(move || query(auth_data.into_inner(), pool)).await;
+
+    let res = web::block(move || {
+        let conn = pool.get().unwrap();
+        req_auth.into_inner().to_authed(&conn)
+    }).await;
 
     match res {
-        Ok(user) => {
-            let user_string = serde_json::to_string(&user).unwrap();
-            id.remember(user_string);
+        Ok(authed_user) => {
+            let identity = serde_json::to_string(&authed_user).unwrap();
+            id.remember(identity);
             Ok(HttpResponse::Ok().finish())
         }
         Err(err) => match err {
@@ -63,27 +65,7 @@ pub async fn login(
     }
 }
 
-pub async fn get_me(logged_user: LoggedUser) -> HttpResponse {
-    HttpResponse::Ok().json(logged_user)
-}
-
-fn query(
-    auth_data: AuthData,
-    pool: web::Data<models::Pool>
-) -> Result<models::SlimUser, errors::ServiceError> {
-    use crate::schema::users::dsl::{email, users};
-
-    let conn: &PgConnection = &pool.get().unwrap();
-    let mut items = users
-        .filter(email.eq(&auth_data.email))
-        .load::<models::User>(conn)?;
-
-    if let Some(user) = items.pop() {
-        if let Ok(matching) = utils::verify(&user.hash, &auth_data.password) {
-            if matching {
-                return Ok(user.into());
-            }
-        }
-    }
-    Err(errors::ServiceError::Unauthorized)
+pub async fn logout(id: Identity) -> HttpResponse {
+    id.forget();
+    HttpResponse::Ok().finish()
 }

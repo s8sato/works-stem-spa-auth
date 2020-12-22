@@ -2,6 +2,7 @@ module Page.LP exposing (..)
 
 import EndPoint as EP
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Http
 import Json.Decode as Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (required)
@@ -77,7 +78,7 @@ update msg mdl =
 view : Mdl -> Html Msg
 view mdl =
     div []
-        [ div [] [ text "LP" ]
+        [ div [ class "title" ] [ text "LP" ]
         , div [] [ text mdl.msg ]
         ]
 

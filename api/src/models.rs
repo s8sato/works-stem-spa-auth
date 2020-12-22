@@ -1,6 +1,5 @@
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize}; // TODO remove
 
 use super::schema::*;
 
@@ -22,15 +21,4 @@ pub struct User {
     pub hash: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SlimUser {
-    pub email: String,
-}
-
-impl From<User> for SlimUser {
-    fn from(user: User) -> Self {
-        SlimUser { email: user.email }
-    }
 }

@@ -28,8 +28,8 @@ impl ResponseError for ServiceError {
 
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> ServiceError {
-        // Right now we just care about UniqueViolation from diesel
-        // But this would be helpful to easily map errors as our app grows
+        // right now we just care about UniqueViolation from diesel
+        // but this would be helpful to easily map errors as our app grows
         match error {
             DBError::DatabaseError(kind, info) => {
                 if let DatabaseErrorKind::UniqueViolation = kind {
