@@ -30,7 +30,7 @@ pub fn send(invitation: &models::Invitation) -> Result<(), errors::ServiceError>
         if invitation.forgot_pw {"reset"} else {"register"},
         invitation.id,
         invitation.expires_at
-            .format("%I:%M %p %A, %-d %B, %C%y")
+            .format("%Y-%m-%dT%H:%M:%S%:z") // RFC 3339
             .to_string()
     );
     email
