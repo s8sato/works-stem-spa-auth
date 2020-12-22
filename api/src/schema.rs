@@ -2,15 +2,17 @@ table! {
     invitations (id) {
         id -> Uuid,
         email -> Varchar,
-        expires_at -> Timestamp,
+        expires_at -> Timestamptz,
     }
 }
 
 table! {
-    users (email) {
+    users (id) {
+        id -> Int4,
         email -> Varchar,
         hash -> Varchar,
-        created_at -> Timestamp,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
     }
 }
 
