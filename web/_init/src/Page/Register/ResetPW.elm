@@ -97,7 +97,7 @@ faultOf mdl =
 
 register : Mdl -> Cmd Msg
 register mdl =
-    U.post_ (EP.Register mdl.key) (encPW mdl.password) (FromS << RegisteredYou)
+    U.post_ EP.Register (encPW mdl.password) (FromS << RegisteredYou)
 
 
 type alias PassWord =

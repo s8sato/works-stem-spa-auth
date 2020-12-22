@@ -19,8 +19,8 @@ strEP ep =
                 EP.Invite ->
                     "invite"
 
-                EP.Register key ->
-                    "register" ++ "/" ++ key
+                EP.Register ->
+                    "register"
 
                 EP.Auth ->
                     "auth"
@@ -100,10 +100,11 @@ strHttpError e =
             "Timeout"
 
         Http.NetworkError ->
-            "NetworkError"
+            "Network Error"
 
+        -- TODO improve "Bad Status 400" to "Bad Request: invitation expired" etc.
         Http.BadStatus code ->
-            "BadStatus " ++ String.fromInt code
+            "Bad Status " ++ String.fromInt code
 
         Http.BadBody msg ->
             msg

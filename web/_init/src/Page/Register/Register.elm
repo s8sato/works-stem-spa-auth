@@ -13,22 +13,22 @@ import Util as U
 
 
 type alias Mdl =
-    { key : String
-    , cred : Cred
+    { cred : Cred
     , confirmation : String
     , msg : String
     }
 
 
 type alias Cred =
-    { email : String
+    { key : String
+    , email : String
     , password : String
     }
 
 
 init : String -> ( Mdl, Cmd Msg )
 init email =
-    ( { key = "", cred = { email = email, password = "" }, confirmation = "", msg = "" }, Cmd.none )
+    ( { cred = { key = "", email = email, password = "" }, confirmation = "", msg = "" }, Cmd.none )
 
 
 
@@ -66,7 +66,14 @@ update msg mdl =
                             ( mdl, register mdl )
 
                 EditKey s ->
-                    ( { mdl | key = s }, Cmd.none )
+                    let
+                        cred =
+                            mdl.cred
+
+                        newCred =
+                            { cred | key = s }
+                    in
+                    ( { mdl | cred = newCred }, Cmd.none )
 
                 EditPassWord s ->
                     let
@@ -101,7 +108,7 @@ faultOf mdl =
     else if String.length mdl.cred.password < 8 then
         Just "Password should be at least 8 length"
 
-    else if String.length mdl.key /= 36 then
+    else if String.length mdl.cred.key /= 36 then
         Just "Enter the register/reset key correctly"
 
     else
@@ -110,7 +117,7 @@ faultOf mdl =
 
 register : Mdl -> Cmd Msg
 register mdl =
-    U.post_ (EP.Register mdl.key) (encCred mdl.cred) (FromS << RegisteredYou)
+    U.post_ EP.Register (encCred mdl.cred) (FromS << RegisteredYou)
 
 
 type alias PassWord =
@@ -120,7 +127,8 @@ type alias PassWord =
 encCred : Cred -> Encode.Value
 encCred c =
     Encode.object
-        [ ( "email", Encode.string c.email )
+        [ ( "key", Encode.string c.key )
+        , ( "email", Encode.string c.email )
         , ( "password", Encode.string c.password )
 
         -- , ( "reset", Encode.bool False ) -- TODO
@@ -136,7 +144,7 @@ view mdl =
     Html.map FromU <|
         div []
             [ div [] [ text "Register" ]
-            , U.input "password" "RegisterKey" mdl.key EditKey
+            , U.input "password" "RegisterKey" mdl.cred.key EditKey
             , U.input "password" "PassWord" mdl.cred.password EditPassWord
             , U.input "password" "Confirmation" mdl.confirmation EditConfirmation
             , button [ onClick RegisterMe ] [ text "RegisterMe" ]

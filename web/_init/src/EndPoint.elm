@@ -3,10 +3,6 @@ module EndPoint exposing (..)
 
 type EndPoint
     = Invite
-    | Register Key
+    | Register
     | Auth
     | App
-
-
-type alias Key =
-    String
