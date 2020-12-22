@@ -2,6 +2,7 @@ module Page.Login exposing (..)
 
 import EndPoint as EP
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Json.Encode as Encode
 import Page as P
@@ -13,12 +14,13 @@ import Util as U
 
 
 type alias Mdl =
-    { cred : Cred
+    { req : Req
     , msg : String
+    , forgot_pw : Bool
     }
 
 
-type alias Cred =
+type alias Req =
     { email : String
     , password : String
     }
@@ -26,7 +28,7 @@ type alias Cred =
 
 init : ( Mdl, Cmd Msg )
 init =
-    ( { cred = { email = "", password = "" }, msg = "" }, Cmd.none )
+    ( { req = { email = "", password = "" }, msg = "", forgot_pw = False }, Cmd.none )
 
 
 
@@ -57,33 +59,33 @@ update msg mdl =
         FromU fromU ->
             case fromU of
                 Login ->
-                    ( mdl, login mdl.cred )
+                    ( mdl, login mdl.req )
 
                 NoAccount ->
-                    ( mdl, U.cmd Goto (P.Invite_ P.Invite) )
+                    ( { mdl | forgot_pw = False }, U.cmd Goto P.Invite )
 
                 ForgotPW ->
-                    ( mdl, U.cmd Goto (P.Invite_ P.ForgotPW) )
+                    ( { mdl | forgot_pw = True }, U.cmd Goto P.Invite )
 
                 EditEmail s ->
                     let
-                        cred =
-                            mdl.cred
+                        req =
+                            mdl.req
 
-                        newCred =
-                            { cred | email = s }
+                        newReq =
+                            { req | email = s }
                     in
-                    ( { mdl | cred = newCred }, Cmd.none )
+                    ( { mdl | req = newReq }, Cmd.none )
 
                 EditPassWord s ->
                     let
-                        cred =
-                            mdl.cred
+                        req =
+                            mdl.req
 
-                        newCred =
-                            { cred | password = s }
+                        newReq =
+                            { req | password = s }
                     in
-                    ( { mdl | cred = newCred }, Cmd.none )
+                    ( { mdl | req = newReq }, Cmd.none )
 
         FromS fromS ->
             case fromS of
@@ -97,16 +99,16 @@ update msg mdl =
             ( mdl, Cmd.none )
 
 
-login : Cred -> Cmd Msg
-login c =
-    U.post_ EP.Auth (encCred c) (FromS << LoggedIn)
+login : Req -> Cmd Msg
+login req =
+    U.post_ EP.Auth (encReq req) (FromS << LoggedIn)
 
 
-encCred : Cred -> Encode.Value
-encCred c =
+encReq : Req -> Encode.Value
+encReq req =
     Encode.object
-        [ ( "email", Encode.string c.email )
-        , ( "password", Encode.string c.password )
+        [ ( "email", Encode.string req.email )
+        , ( "password", Encode.string req.password )
         ]
 
 
@@ -118,14 +120,12 @@ view : Mdl -> Html Msg
 view mdl =
     Html.map FromU <|
         div []
-            [ div [] [ text "Login" ]
-            , U.input "email" "Email" mdl.cred.email EditEmail
-            , U.input "password" "PassWord" mdl.cred.password EditPassWord
-            , button [ onClick Login ] [ text "Login" ]
-            , button [ onClick NoAccount ] [ text "NoAccount" ]
-
-            -- TODO implement server side
-            -- , button [ onClick ForgotPW ] [ text "ForgotPW" ]
+            [ div [ class "title" ] [ text "Login" ]
+            , div [] [ U.input "email" "Email" mdl.req.email EditEmail ]
+            , div [] [ U.input "password" "Password" mdl.req.password EditPassWord ]
+            , div [] [ button [ onClick Login ] [ text "Login" ] ]
+            , div [] [ button [ onClick NoAccount ] [ text "No Account" ] ]
+            , div [] [ button [ onClick ForgotPW ] [ text "Forgot Password" ] ]
             , div [] [ text mdl.msg ]
             ]
 

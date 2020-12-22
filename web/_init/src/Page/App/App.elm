@@ -2,6 +2,7 @@ module Page.App.App exposing (..)
 
 import EndPoint as EP
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Page as P
 import Util as U
@@ -77,10 +78,10 @@ view : Mdl -> Html Msg
 view mdl =
     Html.map FromU <|
         div []
-            [ div [] [ text "App" ]
+            [ div [ class "title" ] [ text "App" ]
             , div [] [ text mdl.user.email ]
             , div [] [ text mdl.msg ]
-            , button [ onClick Logout ] [ text "Logout" ]
+            , div [] [ button [ onClick Logout ] [ text "Logout" ] ]
             ]
 
 

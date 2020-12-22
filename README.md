@@ -2,7 +2,7 @@
 
 __Under development:__
 
-- [ ] implement password forgetting handler
+- [x] implement password forgetting handler
 - [ ] check the production part of the Dockerfile
 - [ ] improve API hot reload speed
 

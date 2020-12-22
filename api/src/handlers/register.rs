@@ -12,6 +12,7 @@ pub struct ReqUser {
     key: uuid::Uuid,
     email: String,
     password: String,
+    reset_pw: bool
 }
 
 #[derive(Insertable)]
@@ -21,23 +22,33 @@ struct NewUser {
     hash: String,
 }
 
+#[derive(AsChangeset)]
+#[table_name = "users"]
+struct AltUser {
+    hash: Option<String>,
+}
+
 impl ReqUser {
-    fn pass(&self, pool: &web::Data<models::Pool>) -> Result<NewUser, errors::ServiceError> {
-        self.validate(pool)?;
+    fn to_new(&self, conn: &models::Conn) -> Result<NewUser, errors::ServiceError> {
+        self.validate(conn)?;
         Ok(NewUser {
             email: self.email.to_owned(),
             hash: utils::hash(&self.password)?,
         })
     }
-    fn validate(&self, pool: &web::Data<models::Pool>) -> Result<(), errors::ServiceError> {
+    fn to_alt(&self, conn: &models::Conn) -> Result<AltUser, errors::ServiceError> {
+        self.validate(conn)?;
+        Ok(AltUser {
+            hash: Some(utils::hash(&self.password)?),
+        })
+    }
+    fn validate(&self, conn: &models::Conn) -> Result<(), errors::ServiceError> {
         use crate::schema::invitations::dsl::{invitations, email};
 
-        let conn = pool.get().unwrap();
-        if let Some(invitation) = invitations
+        if let Ok(invitation) = invitations
             .find(&self.key)
             .filter(email.eq(&self.email))
-            .load::<models::Invitation>(&conn)?
-            .pop() {
+            .first::<models::Invitation>(conn) {
                 if chrono::Utc::now() < invitation.expires_at {
                     return Ok(())
                 }
@@ -53,11 +64,18 @@ pub async fn register(
 ) -> Result<HttpResponse, errors::ServiceError> {
 
     let res = web::block(move || {
-        use crate::schema::users::dsl::users;
+        use crate::schema::users::dsl::{users, email};
 
-        let new_user = req_user.into_inner().pass(&pool)?;
         let conn = pool.get().unwrap();
-        let user: models::User = diesel::insert_into(users).values(&new_user).get_result(&conn)?;
+        let req = req_user.into_inner();
+        let user: models::User = if req.reset_pw {
+            let old_user = users.filter(email.eq(&req.email)).first::<models::User>(&conn)?;
+            let alt_user = req.to_alt(&conn)?;
+            diesel::update(&old_user).set(&alt_user).get_result(&conn)?
+        } else {
+            let new_user = req.to_new(&conn)?;
+            diesel::insert_into(users).values(&new_user).get_result(&conn)?
+        };
 
         Ok(models::SlimUser::from(user))
     }).await;
@@ -65,7 +83,10 @@ pub async fn register(
     match res {
         Ok(slim_user) => Ok(HttpResponse::Ok().json(&slim_user)),
         Err(err) => match err {
-            BlockingError::Error(service_error) => Err(service_error),
+            BlockingError::Error(service_error) => {
+                dbg!(&service_error);
+                Err(service_error)
+            },
             BlockingError::Canceled => Err(errors::ServiceError::InternalServerError),
         },
     }

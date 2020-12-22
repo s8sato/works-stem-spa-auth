@@ -4,12 +4,10 @@ import Html exposing (Html)
 import Html.Attributes exposing (id)
 import Page as P
 import Page.App.App as App
-import Page.Invite.ForgotPW as ForgotPW
-import Page.Invite.Invite as Invite
+import Page.Invite as Invite
 import Page.LP as LP
 import Page.Login as Login
-import Page.Register.Register as Register
-import Page.Register.ResetPW as ResetPW
+import Page.Register as Register
 import Util as U
 
 
@@ -19,20 +17,10 @@ import Util as U
 
 type Mdl
     = LPMdl LP.Mdl
-    | InviteMdl_ InviteMdl
-    | RegisterMdl_ RegisterMdl
+    | InviteMdl Invite.Mdl
+    | RegisterMdl Register.Mdl
     | LoginMdl Login.Mdl
     | AppMdl_ AppMdl
-
-
-type InviteMdl
-    = InviteMdl Invite.Mdl
-    | ForgotPWMdl ForgotPW.Mdl
-
-
-type RegisterMdl
-    = RegisterMdl Register.Mdl
-    | ResetPWMdl ResetPW.Mdl
 
 
 type AppMdl
@@ -50,20 +38,10 @@ init =
 
 type Msg
     = LPMsg LP.Msg
-    | InviteMsg_ InviteMsg
-    | RegisterMsg_ RegisterMsg
+    | InviteMsg Invite.Msg
+    | RegisterMsg Register.Msg
     | LoginMsg Login.Msg
     | AppMsg_ AppMsg
-
-
-type InviteMsg
-    = InviteMsg Invite.Msg
-    | ForgotPWMsg ForgotPW.Msg
-
-
-type RegisterMsg
-    = RegisterMsg Register.Msg
-    | ResetPWMsg ResetPW.Msg
 
 
 type AppMsg
@@ -81,17 +59,11 @@ update msg mdl =
                 ( LPMsg msg_, LPMdl mdl_ ) ->
                     LP.update msg_ mdl_ |> U.map LPMdl LPMsg
 
-                ( InviteMsg_ (InviteMsg msg_), InviteMdl_ (InviteMdl mdl_) ) ->
-                    Invite.update msg_ mdl_ |> U.map (InviteMdl_ << InviteMdl) (InviteMsg_ << InviteMsg)
+                ( InviteMsg msg_, InviteMdl mdl_ ) ->
+                    Invite.update msg_ mdl_ |> U.map InviteMdl InviteMsg
 
-                ( InviteMsg_ (ForgotPWMsg msg_), InviteMdl_ (ForgotPWMdl mdl_) ) ->
-                    ForgotPW.update msg_ mdl_ |> U.map (InviteMdl_ << ForgotPWMdl) (InviteMsg_ << ForgotPWMsg)
-
-                ( RegisterMsg_ (RegisterMsg msg_), RegisterMdl_ (RegisterMdl mdl_) ) ->
-                    Register.update msg_ mdl_ |> U.map (RegisterMdl_ << RegisterMdl) (RegisterMsg_ << RegisterMsg)
-
-                ( RegisterMsg_ (ResetPWMsg msg_), RegisterMdl_ (ResetPWMdl mdl_) ) ->
-                    ResetPW.update msg_ mdl_ |> U.map (RegisterMdl_ << ResetPWMdl) (RegisterMsg_ << ResetPWMsg)
+                ( RegisterMsg msg_, RegisterMdl mdl_ ) ->
+                    Register.update msg_ mdl_ |> U.map RegisterMdl RegisterMsg
 
                 ( LoginMsg msg_, LoginMdl mdl_ ) ->
                     Login.update msg_ mdl_ |> U.map LoginMdl LoginMsg
@@ -114,17 +86,11 @@ view mdl =
             LPMdl m ->
                 LP.view m |> Html.map LPMsg
 
-            InviteMdl_ (InviteMdl m) ->
-                Invite.view m |> Html.map (InviteMsg_ << InviteMsg)
+            InviteMdl m ->
+                Invite.view m |> Html.map InviteMsg
 
-            InviteMdl_ (ForgotPWMdl m) ->
-                ForgotPW.view m |> Html.map (InviteMsg_ << ForgotPWMsg)
-
-            RegisterMdl_ (RegisterMdl m) ->
-                Register.view m |> Html.map (RegisterMsg_ << RegisterMsg)
-
-            RegisterMdl_ (ResetPWMdl m) ->
-                ResetPW.view m |> Html.map (RegisterMsg_ << ResetPWMsg)
+            RegisterMdl m ->
+                Register.view m |> Html.map RegisterMsg
 
             LoginMdl m ->
                 Login.view m |> Html.map LoginMsg
@@ -144,17 +110,11 @@ subscriptions mdl =
         LPMdl m ->
             LP.subscriptions m |> Sub.map LPMsg
 
-        InviteMdl_ (InviteMdl m) ->
-            Invite.subscriptions m |> Sub.map (InviteMsg_ << InviteMsg)
+        InviteMdl m ->
+            Invite.subscriptions m |> Sub.map InviteMsg
 
-        InviteMdl_ (ForgotPWMdl m) ->
-            ForgotPW.subscriptions m |> Sub.map (InviteMsg_ << ForgotPWMsg)
-
-        RegisterMdl_ (RegisterMdl m) ->
-            Register.subscriptions m |> Sub.map (RegisterMsg_ << RegisterMsg)
-
-        RegisterMdl_ (ResetPWMdl m) ->
-            ResetPW.subscriptions m |> Sub.map (RegisterMsg_ << ResetPWMsg)
+        RegisterMdl m ->
+            Register.subscriptions m |> Sub.map RegisterMsg
 
         LoginMdl m ->
             Login.subscriptions m |> Sub.map LoginMsg
@@ -173,16 +133,10 @@ findGoto msg =
         LPMsg (LP.Goto page) ->
             Just page
 
-        InviteMsg_ (InviteMsg (Invite.Goto page)) ->
+        InviteMsg (Invite.Goto page) ->
             Just page
 
-        InviteMsg_ (ForgotPWMsg (ForgotPW.Goto page)) ->
-            Just page
-
-        RegisterMsg_ (RegisterMsg (Register.Goto page)) ->
-            Just page
-
-        RegisterMsg_ (ResetPWMsg (ResetPW.Goto page)) ->
+        RegisterMsg (Register.Goto page) ->
             Just page
 
         LoginMsg (Login.Goto page) ->
@@ -201,22 +155,21 @@ goto page mdl =
         P.LP ->
             LP.init |> U.map LPMdl LPMsg
 
-        P.Invite_ P.Invite ->
-            Invite.init |> U.map (InviteMdl_ << InviteMdl) (InviteMsg_ << InviteMsg)
-
-        P.Invite_ P.ForgotPW ->
-            ForgotPW.init |> U.map (InviteMdl_ << ForgotPWMdl) (InviteMsg_ << ForgotPWMsg)
-
-        P.Register_ P.Register ->
+        P.Invite ->
             case mdl of
-                InviteMdl_ (InviteMdl m) ->
-                    Register.init m.email |> U.map (RegisterMdl_ << RegisterMdl) (RegisterMsg_ << RegisterMsg)
+                LoginMdl m ->
+                    Invite.init m.forgot_pw |> U.map InviteMdl InviteMsg
 
                 _ ->
                     ( mdl, Cmd.none )
 
-        P.Register_ P.ResetPW ->
-            ResetPW.init |> U.map (RegisterMdl_ << ResetPWMdl) (RegisterMsg_ << ResetPWMsg)
+        P.Register ->
+            case mdl of
+                InviteMdl m ->
+                    Register.init m.req.email m.req.forgot_pw |> U.map RegisterMdl RegisterMsg
+
+                _ ->
+                    ( mdl, Cmd.none )
 
         P.Login ->
             Login.init |> U.map LoginMdl LoginMsg

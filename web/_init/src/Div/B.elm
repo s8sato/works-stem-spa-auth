@@ -1,5 +1,6 @@
 module Div.B exposing (..)
 
+-- https://elm-lang.org/examples/cube
 -- Render a spinning cube.
 --
 -- Dependencies:

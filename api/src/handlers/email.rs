@@ -16,13 +16,18 @@ pub fn send(invitation: &models::Invitation) -> Result<(), errors::ServiceError>
         transmission::EmailAddress::new(sending_addr, sender)
     );
     let recipient: transmission::Recipient = invitation.email.as_str().into();
-    let subject = format!("Invitation to {}", utils::env_var("APP_NAME"));
+    let subject = if invitation.forgot_pw {
+        "Password reset information".into()
+    } else {
+        format!("Invitation to {}", utils::env_var("APP_NAME"))
+    };
     let body = format!("\
-        Your register key is: <br>
+        Your {} key is: <br>
         <span style=\"font-size: x-large; font-weight: bold;\">{}</span> <br>
         The key expires on: <br>
         <span style=\"font-weight: bold;\">{}</span> <br>
         ",
+        if invitation.forgot_pw {"reset"} else {"register"},
         invitation.id,
         invitation.expires_at
             .format("%I:%M %p %A, %-d %B, %C%y")

@@ -3,6 +3,7 @@ table! {
         id -> Uuid,
         email -> Varchar,
         expires_at -> Timestamptz,
+        forgot_pw -> Bool,
     }
 }
 
